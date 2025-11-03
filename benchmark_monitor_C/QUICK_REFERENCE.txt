@@ -1,0 +1,251 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║            🎯 BENCHMARK MONITOR C++ - QUICK REFERENCE                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📦 ARCHIVOS DEL PROYECTO
+─────────────────────────────────────────────────────────────────────────────
+ ⭐ benchmark_monitor.cpp           → Microbenchmarks principales (5 tipos)
+ 📊 system_monitor.h/.cpp           → Monitoreo de sistema (CPU, RAPL, temp)
+ 🏗️  CMakeLists.txt                 → Configuración de compilación
+ 🔨 build.sh                        → Script de compilación automática
+ 🚀 run_benchmark_with_perf.sh      → Ejecutor con perf stat
+ 📊 analyze_cpp_results.py          → Analizador de resultados CSV
+ 📖 README.md                       → Documentación completa
+ 📝 QUICK_REFERENCE.txt             → Este archivo
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 COMANDOS BÁSICOS
+─────────────────────────────────────────────────────────────────────────────
+
+1️⃣ COMPILAR
+   ./build.sh
+
+2️⃣ EJECUTAR (simple)
+   ./benchmark_monitor
+
+3️⃣ EJECUTAR (con perf - recomendado)
+   sudo ./run_benchmark_with_perf.sh
+
+4️⃣ ANALIZAR RESULTADOS
+   python3 analyze_cpp_results.py
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 MICROBENCHMARKS IMPLEMENTADOS
+─────────────────────────────────────────────────────────────────────────────
+ ✅ BM_VectorAdd         → Suma vectorial c[i] = a[i] + b[i]
+    Tamaños: 16K - 1M elementos
+    Tipo: Memory-bound
+
+ ✅ BM_DotProduct        → Producto punto Σ(a[i] × b[i])
+    Tamaños: 16K - 1M elementos
+    Tipo: Compute-bound
+
+ ✅ BM_MemCpy            → memcpy(dst, src, N)
+    Tamaños: 16K - 16M bytes
+    Tipo: Memory bandwidth (optimizado)
+
+ ✅ BM_LoopCopy          → for(i) dst[i] = src[i]
+    Tamaños: 16K - 16M bytes
+    Tipo: Memory bandwidth (manual)
+
+ ✅ BM_MatrixMultiply    → C = A × B
+    Tamaños: 32×32, 64×64, 128×128
+    Tipo: Compute-intensive
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📈 MÉTRICAS RECOLECTADAS (18 columnas CSV)
+─────────────────────────────────────────────────────────────────────────────
+
+ CPU Info:
+   • cpu_freq_MHz      → Frecuencia actual de CPU
+   • cpu_governor      → Governor (performance/powersave)
+   • cpu_usage_pct     → Uso de CPU en %
+   • threads           → Número de threads
+
+ Perf Metrics (con perf stat):
+   • instructions      → Instrucciones ejecutadas
+   • cycles            → Ciclos de CPU
+   • ipc               → Instructions Per Cycle
+   • cache_misses      → Fallos de caché
+   • branch_misses     → Fallos de predicción
+
+ Energy Metrics (RAPL):
+   • energy_uj         → Energía en microjoules
+   • energy_J          → Energía en joules
+   • power_avg_W       → Potencia promedio en watts
+
+ Derivadas:
+   • edp               → Energy Delay Product = E × t²
+   • time_s            → Tiempo de ejecución
+   • temperature_C     → Temperatura de CPU
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 OPCIONES AVANZADAS
+─────────────────────────────────────────────────────────────────────────────
+
+ Ejecutar benchmarks específicos:
+   ./benchmark_monitor --benchmark_filter=VectorAdd
+
+ Ajustar tiempo mínimo:
+   ./benchmark_monitor --benchmark_min_time=2.0
+
+ Repetir benchmarks:
+   ./benchmark_monitor --benchmark_repetitions=10
+
+ Ver ayuda:
+   ./benchmark_monitor --help
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔑 REQUISITOS
+─────────────────────────────────────────────────────────────────────────────
+ Sistema:
+   ✓ Linux (Ubuntu/Debian/Fedora)
+   ✓ CPU Intel con RAPL (AMD funciona con limitaciones)
+   ✓ x86_64
+
+ Software:
+   ✓ g++ 7.0+ o clang++ 5.0+
+   ✓ CMake 3.10+
+   ✓ Google Benchmark (incluido en repo)
+   ✓ perf (linux-tools)
+
+ Permisos:
+   ⚠️  sudo requerido para RAPL y perf
+   ⚠️  Sin sudo: funciona con métricas limitadas
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 EJEMPLO DE SALIDA
+─────────────────────────────────────────────────────────────────────────────
+
+$ sudo ./run_benchmark_with_perf.sh
+
+════════════════════════════════════════════════════════════════════════════
+BENCHMARK MONITOR C++ - Sistema de Microbenchmarking
+════════════════════════════════════════════════════════════════════════════
+
+🔍 Configuración del sistema:
+   CPU Cores: 16
+   CPU Freq: 2400.0 MHz
+   Governor: performance
+   ✅ RAPL disponible
+
+🚀 Ejecutando benchmarks...
+
+BM_VectorAdd/16384: 0.125 ms, Energy: 0.000015 J, Temp: 52.3 °C
+BM_VectorAdd/65536: 0.487 ms, Energy: 0.000058 J, Temp: 52.5 °C
+BM_DotProduct/16384: 0.089 ms, Energy: 0.000011 J, Temp: 52.1 °C
+...
+
+📊 Métricas de perf stat:
+────────────────────────────────────────────────────────────────────────────
+  Instructions:   12345678901
+  Cycles:         5432109876
+  IPC:            2.273
+  Cache misses:   123456
+  Branch misses:  45678
+
+✅ Benchmark completado
+📄 Resultados guardados en: results_cpp.csv
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🛠️ TROUBLESHOOTING
+─────────────────────────────────────────────────────────────────────────────
+
+ Problema                         Solución
+ ───────────────────────────────  ──────────────────────────────────────────
+ "Google Benchmark no encontrado" cd .. && mkdir build && cd build
+                                  cmake .. -DCMAKE_BUILD_TYPE=Release
+                                  make -j && cd ../benchmark_monitor_C
+
+ "perf no disponible"             sudo apt-get install linux-tools-common
+
+ "RAPL no disponible"             Normal en AMD o VMs
+                                  Ejecutar con sudo para Intel
+
+ Error de compilación             Verificar g++ >= 7.0:
+                                  g++ --version
+
+ "Permission denied" en RAPL      sudo ./run_benchmark_with_perf.sh
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚖️  COMPARACIÓN: C++ vs PYTHON
+─────────────────────────────────────────────────────────────────────────────
+
+ Aspecto           C++ (este)              Python (benchmark_monitor)
+ ────────────────  ───────────────────────  ──────────────────────────
+ Velocidad         🚀 10-100x más rápido    ✓ Más lento
+ Precisión         ⭐⭐⭐⭐⭐               ⭐⭐⭐⭐
+ Compilación       ⚠️  Requiere             ✅ Listo
+ Modificación      ⚠️  Recompilar           ✅ Directo
+ Uso de memoria    ✅ Muy eficiente         ⚠️  Mayor overhead
+ Google Benchmark  ✅ Integrado             ❌ N/A
+
+ Usa C++ para: Producción, máximo rendimiento, caracterización HPC
+ Usa Python para: Prototipado rápido, análisis exploratorio
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎓 CASOS DE USO
+─────────────────────────────────────────────────────────────────────────────
+
+ 1. Comparar optimizaciones del compilador:
+    for opt in O0 O1 O2 O3; do
+        sed -i "s/-O./-$opt/" CMakeLists.txt
+        ./build.sh
+        sudo ./run_benchmark_with_perf.sh
+        mv results_cpp.csv results_$opt.csv
+    done
+
+ 2. Comparar CPU governors:
+    sudo cpupower frequency-set -g performance
+    sudo ./run_benchmark_with_perf.sh
+    mv results_cpp.csv results_perf.csv
+
+    sudo cpupower frequency-set -g powersave
+    sudo ./run_benchmark_with_perf.sh
+    mv results_cpp.csv results_save.csv
+
+ 3. Análisis de escalabilidad:
+    # Editar rangos en benchmark_monitor.cpp
+    BENCHMARK(BM_VectorAdd)->Range(1<<10, 1<<26);
+    ./build.sh && sudo ./run_benchmark_with_perf.sh
+
+ 4. Comparar C++ vs Python:
+    sudo ./run_benchmark_with_perf.sh
+    cd ../benchmark_monitor
+    sudo python3 benchmark_monitor.py
+    # Comparar results_cpp.csv vs results.csv
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 ARCHIVOS GENERADOS
+─────────────────────────────────────────────────────────────────────────────
+ results_cpp.csv        → Resultados en CSV (18 columnas)
+ benchmark_monitor      → Binario compilado
+ build/                 → Directorio de compilación (CMake)
+ perf_output.tmp        → Temporal de perf (auto-borrado)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📖 MÁS INFORMACIÓN
+─────────────────────────────────────────────────────────────────────────────
+ → README.md                      Documentación completa
+ → analyze_cpp_results.py         Análisis estadístico de resultados
+ → ../benchmark_monitor/          Versión Python equivalente
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ TODO LISTO - Ejecuta: ./build.sh && sudo ./run_benchmark_with_perf.sh
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║         Creado para: HPC Microbenchmarking con Google Benchmark C++          ║
+║         Sistema profesional de monitoreo de rendimiento y energía            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
